@@ -9,12 +9,20 @@
 # You don't need to understand this helper code,
 # but you will have to know how to use the functions
 # (so be sure to read the docstrings!)
+import os  # Needed for clearing the console
 import random
 import string
 
 WORDLIST_FILENAME = "words.txt"
 permitted_chars = string.ascii_lowercase
 
+def clear_screen():
+    # Check if the operating system is Windows
+    if os.name == 'nt':
+        _ = os.system('cls')
+    # For macOS, Linux/Unix
+    else:
+        _ = os.system('clear')
 
 def load_words():
     """
@@ -144,7 +152,82 @@ def warning_decrement(num_of_guesses, num_of_warnings):
         print("You have no warnings left, so you lose one guess.")
     return num_of_guesses, num_of_warnings
 
+def hangman_figure(guesses_left):
+    states = [
+        # Final state: head, torso, both arms, and both legs
+        """
+           ------
+           |    |
+           |    O
+           |   \\|/
+           |    |
+           |   / \\
+          ---
+        """,
+        # State 5: head, torso, both arms, and one leg
+        """
+           ------
+           |    |
+           |    O
+           |   \\|/
+           |    |
+           |   /
+          ---
+        """,
+        # State 4: head, torso, and both arms
+        """
+           ------
+           |    |
+           |    O
+           |   \\|/
+           |    |
+           |   
+          ---
+        """,
+        # State 3: head, torso, and one arm
+        """
+           ------
+           |    |
+           |    O
+           |   \\|
+           |    |
+           |   
+          ---
+        """,
+        # State 2: head and torso
+        """
+           ------
+           |    |
+           |    O
+           |    |
+           |    |
+           |   
+          ---
+        """,
+        # State 1: head
+        """
+           ------
+           |    |
+           |    O
+           |    
+           |    
+           |   
+          ---
+        """,
+        # State 0: initial empty state
+        """
+           ------
+           |    |
+           |    
+           |    
+           |    
+           |   
+          ---
+        """
+    ]
+    return states[6 - guesses_left]
 
+    
 def hangman(secret_word):
     '''
     secret_word: string, the secret word to guess.
@@ -174,15 +257,24 @@ def hangman(secret_word):
     unique_chars_of_secret_word = set_of_unique_chars_in_word(secret_word)
     number_of_guesses = 6
     number_of_warnings = 3
-    game_over = False
     letters_correctly_guessed = set()  # Initialize empty set
     letters_incorrectly_guessed = set()  # Initialize empty set
+    welcome_shown = False  # Tracks whether the welcome message has been shown
+
     print(
         f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
     )
 
     # Create a loop here to play the game until resolution.
     while number_of_guesses > 0:
+        clear_screen()  # Clear the screen for a new turn
+        print(hangman_figure(6 - number_of_guesses))  # Print the hangman figure
+        
+        # Check if the welcome message has been shown
+        if not welcome_shown:
+            print(f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long.")
+            welcome_shown = True  # Set the flag to True after showing the welcome message
+            
         print(f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left.")
         available_letters = get_available_letters(
             letters_correctly_guessed.union(letters_incorrectly_guessed))
@@ -235,6 +327,7 @@ def hangman(secret_word):
             break  # Game won, exit the loop
 
         if number_of_guesses <= 0:  # Check if no guesses left
+            print(hangman_figure(6 - number_of_guesses))  # Print the hangman figure
             print(
                 f"Sorry, you ran out of guesses. The word was '{secret_word}'."
             )
