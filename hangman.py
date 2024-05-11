@@ -16,6 +16,7 @@ import string
 WORDLIST_FILENAME = "words.txt"
 permitted_chars = string.ascii_lowercase
 
+
 def clear_screen():
     # Check if the operating system is Windows
     if os.name == 'nt':
@@ -23,6 +24,7 @@ def clear_screen():
     # For macOS, Linux/Unix
     else:
         _ = os.system('clear')
+
 
 def load_words():
     """
@@ -152,6 +154,7 @@ def warning_decrement(num_of_guesses, num_of_warnings):
         print("You have no warnings left, so you lose one guess.")
     return num_of_guesses, num_of_warnings
 
+
 def hangman_figure(guesses_left):
     states = [
         # Final state: head, torso, both arms, and both legs
@@ -227,7 +230,7 @@ def hangman_figure(guesses_left):
     ]
     return states[6 - guesses_left]
 
-    
+
 def hangman(secret_word):
     '''
     secret_word: string, the secret word to guess.
@@ -258,29 +261,40 @@ def hangman(secret_word):
     number_of_warnings = 3
     letters_guessed = set()
 
-    print(f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long.")
+    print(
+        f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
+    )
 
     while number_of_guesses > 0:
         clear_screen()
         print(hangman_figure(6 - number_of_guesses))
-        print(f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left.")
+        print(
+            f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left."
+        )
         print("Available letters:", get_available_letters(letters_guessed))
-        print("Current guessed word:", get_guessed_word(secret_word, letters_guessed))
+        print("Current guessed word:",
+              get_guessed_word(secret_word, letters_guessed))
 
         guess = input("Please enter a letter: ").lower()
 
         if guess in letters_guessed:
-            number_of_guesses, number_of_warnings = warning_decrement(number_of_guesses, number_of_warnings)
-            print(f"You've already guessed that letter. You now have {number_of_warnings} warnings left.")
+            number_of_guesses, number_of_warnings = warning_decrement(
+                number_of_guesses, number_of_warnings)
+            print(
+                f"You've already guessed that letter. You now have {number_of_warnings} warnings left."
+            )
         elif guess in permitted_chars and len(guess) == 1:
             letters_guessed.add(guess)
             if guess in secret_word:
-                print("Good guess: ", get_guessed_word(secret_word, letters_guessed))
+                print("Good guess: ",
+                      get_guessed_word(secret_word, letters_guessed))
             else:
                 number_of_guesses -= 1
-                print("Oops! That letter is not in my word:", get_guessed_word(secret_word, letters_guessed))
+                print("Oops! That letter is not in my word:",
+                      get_guessed_word(secret_word, letters_guessed))
         else:
-            number_of_guesses, number_of_warnings = warning_decrement(number_of_guesses, number_of_warnings)
+            number_of_guesses, number_of_warnings = warning_decrement(
+                number_of_guesses, number_of_warnings)
             print("Invalid entry. Please enter a lowercase English letter.")
 
         if is_word_guessed(secret_word, letters_guessed):
@@ -289,8 +303,6 @@ def hangman(secret_word):
 
         if number_of_guesses <= 0:
             print("Sorry, you ran out of guesses. The word was", secret_word)
-
-            # The rest of the code for handling hints and other functionalities can follow.
 
             break  # No guesses left, exit the loop
 
