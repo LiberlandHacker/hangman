@@ -1,6 +1,6 @@
 # Problem Set 2, hangman.py
 # Name: Jonathan A. McCormick, Jr.
-# Collaborators:
+# Collaborators: Replit, ChatGPT
 # Time spent: 6h
 
 # Hangman Game
@@ -9,12 +9,20 @@
 # You don't need to understand this helper code,
 # but you will have to know how to use the functions
 # (so be sure to read the docstrings!)
+import os  # Needed for clearing the console
 import random
 import string
 
 WORDLIST_FILENAME = "words.txt"
 permitted_chars = string.ascii_lowercase
 
+def clear_screen():
+    # Check if the operating system is Windows
+    if os.name == 'nt':
+        _ = os.system('cls')
+    # For macOS, Linux/Unix
+    else:
+        _ = os.system('clear')
 
 def load_words():
     """
@@ -144,7 +152,82 @@ def warning_decrement(num_of_guesses, num_of_warnings):
         print("You have no warnings left, so you lose one guess.")
     return num_of_guesses, num_of_warnings
 
+def hangman_figure(guesses_left):
+    states = [
+        # Final state: head, torso, both arms, and both legs
+        """
+           ------
+           |    |
+           |    O
+           |   \\|/
+           |    |
+           |   / \\
+          ---
+        """,
+        # State 5: head, torso, both arms, and one leg
+        """
+           ------
+           |    |
+           |    O
+           |   \\|/
+           |    |
+           |   /
+          ---
+        """,
+        # State 4: head, torso, and both arms
+        """
+           ------
+           |    |
+           |    O
+           |   \\|/
+           |    |
+           |   
+          ---
+        """,
+        # State 3: head, torso, and one arm
+        """
+           ------
+           |    |
+           |    O
+           |   \\|
+           |    |
+           |   
+          ---
+        """,
+        # State 2: head and torso
+        """
+           ------
+           |    |
+           |    O
+           |    |
+           |    |
+           |   
+          ---
+        """,
+        # State 1: head
+        """
+           ------
+           |    |
+           |    O
+           |    
+           |    
+           |   
+          ---
+        """,
+        # State 0: initial empty state
+        """
+           ------
+           |    |
+           |    
+           |    
+           |    
+           |   
+          ---
+        """
+    ]
+    return states[6 - guesses_left]
 
+    
 def hangman(secret_word):
     '''
     secret_word: string, the secret word to guess.
@@ -174,20 +257,34 @@ def hangman(secret_word):
     unique_chars_of_secret_word = set_of_unique_chars_in_word(secret_word)
     number_of_guesses = 6
     number_of_warnings = 3
-    game_over = False
     letters_correctly_guessed = set()  # Initialize empty set
     letters_incorrectly_guessed = set()  # Initialize empty set
+    welcome_shown = False  # Tracks whether the welcome message has been shown
+    feedback_message = ""
+
     print(
         f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
     )
 
     # Create a loop here to play the game until resolution.
     while number_of_guesses > 0:
+        clear_screen()  # Clear the screen for a new turn
+        print(hangman_figure(6 - number_of_guesses))  # Print the hangman figure
+        
+        # Check if the welcome message has been shown
+        if not welcome_shown:
+            print(f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long.")
+            welcome_shown = True  # Set the flag to True after showing the welcome message
+            
+        if feedback_message:  # Display feedback from previous turn if exists
+            print(feedback_message)
+            
         print(f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left.")
         available_letters = get_available_letters(
             letters_correctly_guessed.union(letters_incorrectly_guessed))
         print(f"Available letters: {available_letters}")
         user_guess = input("Please enter a letter: ").lower()
+        feedback_message = f"Last guess was: '{user_guess}'.\n"
 
         # Validate the user's entry
 
@@ -195,49 +292,41 @@ def hangman(secret_word):
             if has_len_1(user_guess):
                 if user_guess not in letters_incorrectly_guessed and user_guess not in letters_correctly_guessed:
                     if user_guess in unique_chars_of_secret_word:
-                        print("Good job! You guessed correctly!")
+                        feedback_message += f"Good job! You guessed correctly! {get_guessed_word(secret_word, letters_correctly_guessed)}\n"
                         letters_correctly_guessed.add(user_guess)
                     else:
-                        print(
-                            f"Oops! That letter is not in my word: {get_guessed_word(secret_word, letters_correctly_guessed)}"
-                        )
+                        feedback_message += f"Oops! That letter is not in my word: {get_guessed_word(secret_word, letters_correctly_guessed)}\n"
                         letters_incorrectly_guessed.add(user_guess)
                         number_of_guesses -= 1  # REPLACE WITH ACTUAL FUNCTION
                 else:
                     # Example usage within the hangman function
                     number_of_guesses, number_of_warnings = warning_decrement(
                         number_of_guesses, number_of_warnings)
-                    print(
-                        f"Oops! You've already guessed that letter. You now have {number_of_guesses} guesses and {number_of_warnings} warnings left."
-                    )
+                    feedback_message += f"Oops! You've already guessed that letter. You now have {number_of_guesses} guesses and {number_of_warnings} warnings left.\n"
+                    
             else:
                 # Example usage within the hangman function
                 number_of_guesses, number_of_warnings = warning_decrement(
                     number_of_guesses, number_of_warnings)
 
-                print(
-                    "Oops! You've entered more than one character, or no character at all."
-                )
+                feedback_message += "Oops! You've entered more than one character, or no character at all.\n"
         else:
             # Example usage within the hangman function
             number_of_guesses, number_of_warnings = warning_decrement(
                 number_of_guesses, number_of_warnings)
 
-            print(
-                "Oops! You've entered an invalid character. Please enter an ASCII lowercase letter."
-            )
+            feedback_message += "Oops! You've entered an invalid character. Please enter an ASCII lowercase letter.\n"
 
         # Determine if the user wins or loses
 
         # User WINS: has guessed the word correctly.
         if is_word_guessed(secret_word, letters_correctly_guessed):
-            print("Congratulations, you won!")
+            feedback_message += "Congratulations, you won!\n"
             break  # Game won, exit the loop
 
         if number_of_guesses <= 0:  # Check if no guesses left
-            print(
-                f"Sorry, you ran out of guesses. The word was '{secret_word}'."
-            )
+            print(hangman_figure(6 - number_of_guesses))  # Print the hangman figure
+            feedback_message += f"Sorry, you ran out of guesses. The word was '{secret_word}'."
             break  # No guesses left, exit the loop
 
 
