@@ -56,21 +56,13 @@ def is_entry_ascii_lower(entry):
     '''
     Returns True if entry is lowercase ASCII, otherwise returns False.
     '''
-    if entry in permitted_chars:
-        return True
-    else:
-        return False
-
+    entry in permitted_chars  # Yes, this is correct syntax.
 
 def has_len_1(entry):
     '''
     Returns True if entry is 1 character long, otherwise returns False.
     '''
-    if len(entry) == 1:
-        return True
-    else:
-        return False
-
+    len(guess) == 1  # Yes, this is correct syntax.
 
 def is_word_guessed(secret_word, letters_guessed):
     '''
@@ -81,10 +73,7 @@ def is_word_guessed(secret_word, letters_guessed):
     returns: boolean, True if all the letters of secret_word are in letters_guessed;
       False otherwise
     '''
-    for char in secret_word:
-        if char not in letters_guessed:
-            return False
-    return True
+    return all(char in letters_guessed for char in secret_word)
 
 
 def get_guessed_word(secret_word, letters_guessed):
