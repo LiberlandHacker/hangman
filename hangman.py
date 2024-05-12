@@ -4,8 +4,6 @@
 # Time spent: 10h
 
 # Hangman Game
-# -----------------------------------
-# Helper code
 # NOTE: I have personally taken the liberty to not be limited by the assignment in a strict sense, but have nonetheless fulfilled the spirit of it, if not the letter of it. 
 import os  # Needed for clearing the console
 import random
@@ -46,9 +44,6 @@ def choose_word(wordlist):
     Returns a word from wordlist at random
     """
     return random.choice(wordlist)
-
-
-# end of helper code
 
 # -----------------------------------
 
@@ -256,12 +251,12 @@ def hangman(secret_word):
     number_of_warnings = 3
     letters_guessed = set()
 
-    print(
-        f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
-    )
-
+    
     while number_of_guesses > 0:
         clear_screen()
+        print(
+            f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
+        )
         print(hangman_figure(6 - number_of_guesses))
         print(
             f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left."
@@ -348,12 +343,12 @@ def hangman_with_hints(secret_word):
     number_of_warnings = 3
     letters_guessed = set()
 
-    print(
-        f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
-    )
 
     while number_of_guesses > 0:
         clear_screen()
+        print(
+            f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
+        )
         print(hangman_figure(6 - number_of_guesses))
         print(
             f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left."
@@ -399,27 +394,3 @@ if __name__ == "__main__":
     secret_word = choose_word(wordlist)
     hangman_with_hints(secret_word)
 
-
-
-# When you've completed your hangman_with_hint function, comment the two similar
-# lines above that were used to run the hangman function, and then uncomment
-# these two lines and run this file to test!
-# Hint: You might want to pick your own secret_word while you're testing.
-
-#if __name__ == "__main__":
-    # pass
-
-    # To test part 2, comment out the pass line above and
-    # uncomment the following two lines.
-
-    #secret_word = choose_word(wordlist)
-    #print("#" * 30 + "\n" + "\nSecret word is: " + secret_word + "\n" * 2 + "#" * 30)
-    #hangman(secret_word)
-
-###############
-
-# To test part 3 re-comment out the above lines and
-# uncomment the following two lines.
-
-#secret_word = choose_word(wordlist)
-#hangman_with_hints(secret_word)
