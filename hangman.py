@@ -1,21 +1,18 @@
 # Problem Set 2, hangman.py
 # Name: Jonathan A. McCormick, Jr.
 # Collaborators: Replit, ChatGPT
-# Time spent: 6h
+# Time spent: 10h
 
 # Hangman Game
 # -----------------------------------
 # Helper code
-# You don't need to understand this helper code,
-# but you will have to know how to use the functions
-# (so be sure to read the docstrings!)
+# NOTE: I have personally taken the liberty to not be limited by the assignment in a strict sense, but have nonetheless fulfilled the spirit of it, if not the letter of it. 
 import os  # Needed for clearing the console
 import random
 import string
 
 WORDLIST_FILENAME = "words.txt"
 permitted_chars = string.ascii_lowercase
-
 
 def clear_screen():
     # Check if the operating system is Windows
@@ -24,7 +21,6 @@ def clear_screen():
     # For macOS, Linux/Unix
     else:
         _ = os.system('clear')
-
 
 def load_words():
     """
@@ -42,7 +38,6 @@ def load_words():
     wordlist = line.split()
     print(f"  {len(wordlist)} words loaded.")
     return wordlist
-
 
 def choose_word(wordlist):
     """
@@ -318,59 +313,92 @@ def hangman(secret_word):
 def match_with_gaps(my_word, other_word):
     '''
     my_word: string with _ characters, current guess of secret word
-    other_word: string, regular English word
-    returns: boolean, True if all the actual letters of my_word match the 
-        corresponding letters of other_word, or the letter is the special symbol
-        _ , and my_word and other_word are of the same length;
-        False otherwise: 
+    other_word: string, one potential matching word
+    returns: boolean, True if all actual letters of my_word match the corresponding
+             letters of other_word and that other_word does not contain any letters
+             that are already revealed in my_word
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
+    my_word = my_word.replace(" ", "")  # Remove spaces from guessed word
+    if len(my_word) != len(other_word):
+        return False
 
+    for (my_char, other_char) in zip(my_word, other_word):
+        if my_char != "_" and my_char != other_char:
+            return False
+        if my_char == "_" and other_char in my_word:
+            return False
+
+    return True
 
 def show_possible_matches(my_word):
     '''
     my_word: string with _ characters, current guess of secret word
     returns: nothing, but should print out every word in wordlist that matches my_word
-             Keep in mind that in hangman when a letter is guessed, all the positions
-             at which that letter occurs in the secret word are revealed.
-             Therefore, the hidden letter(_ ) cannot be one of the letters in the word
-             that has already been revealed.
-
     '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
-
+    matches = [word for word in wordlist if match_with_gaps(my_word, word)]
+    if matches:
+        print("Possible word matches are:")
+        print(" ".join(matches))
+    else:
+        print("No matches found.")
 
 def hangman_with_hints(secret_word):
-    '''
-    secret_word: string, the secret word to guess.
+    length_of_secret_word = len(secret_word)
+    number_of_guesses = 6
+    number_of_warnings = 3
+    letters_guessed = set()
 
-    Starts up an interactive game of Hangman.
+    print(
+        f"Welcome to the game Hangman!\nI am thinking of a word that is {length_of_secret_word} letters long."
+    )
 
-    * At the start of the game, let the user know how many 
-      letters the secret_word contains and how many guesses s/he starts with.
+    while number_of_guesses > 0:
+        clear_screen()
+        print(hangman_figure(6 - number_of_guesses))
+        print(
+            f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left."
+        )
+        print("Available letters:", get_available_letters(letters_guessed))
+        print("Current guessed word:",
+              get_guessed_word(secret_word, letters_guessed))
 
-    * The user should start with 6 guesses
+        guess = input("Please enter a letter, or '*' for a hint: ").lower()
 
-    * Before each round, you should display to the user how many guesses
-      s/he has left and the letters that the user has not yet guessed.
+        if guess == "*":
+            show_possible_matches(get_guessed_word(secret_word, letters_guessed))
+            input("Press enter to continue...")  # Wait for user input
+        elif guess in letters_guessed:
+            number_of_guesses, number_of_warnings = warning_decrement(
+                number_of_guesses, number_of_warnings)
+            print(
+                f"You've already guessed that letter. You now have {number_of_warnings} warnings left."
+            )
+        elif guess in permitted_chars and len(guess) == 1:
+            letters_guessed.add(guess)
+            if guess in secret_word:
+                print("Good guess: ",
+                      get_guessed_word(secret_word, letters_guessed))
+            else:
+                number_of_guesses -= 1
+                print("Oops! That letter is not in my word:",
+                      get_guessed_word(secret_word, letters_guessed))
+        else:
+            number_of_guesses, number_of_warnings = warning_decrement(
+                number_of_guesses, number_of_warnings)
+            print("Invalid entry. Please enter a lowercase English letter.")
 
-    * Ask the user to supply one guess per round. Make sure to check that the user guesses a letter
+        if is_word_guessed(secret_word, letters_guessed):
+            print("Congratulations, you won!")
+            break
 
-    * The user should receive feedback immediately after each guess 
-      about whether their guess appears in the computer's word.
+        if number_of_guesses <= 0:
+            print("Sorry, you ran out of guesses. The word was", secret_word)
+            break  # No guesses left, exit the loop
 
-    * After each guess, you should display to the user the 
-      partially guessed word so far.
+if __name__ == "__main__":
+    secret_word = choose_word(wordlist)
+    hangman_with_hints(secret_word)
 
-    * If the guess is the symbol *, print out all words in wordlist that
-      matches the current guessed word. 
-
-    Follows the other limitations detailed in the problem write-up.
-    '''
-    # FILL IN YOUR CODE HERE AND DELETE "pass"
-    pass
 
 
 # When you've completed your hangman_with_hint function, comment the two similar
@@ -378,16 +406,15 @@ def hangman_with_hints(secret_word):
 # these two lines and run this file to test!
 # Hint: You might want to pick your own secret_word while you're testing.
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # pass
 
     # To test part 2, comment out the pass line above and
     # uncomment the following two lines.
 
-    secret_word = choose_word(wordlist)
-    print("#" * 30 + "\n" + "\nSecret word is: " + secret_word + "\n" * 2 +
-          "#" * 30)
-    hangman(secret_word)
+    #secret_word = choose_word(wordlist)
+    #print("#" * 30 + "\n" + "\nSecret word is: " + secret_word + "\n" * 2 + "#" * 30)
+    #hangman(secret_word)
 
 ###############
 
