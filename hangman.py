@@ -58,12 +58,6 @@ def is_entry_ascii_lower(entry):
     '''
     entry in permitted_chars  # Yes, this is correct syntax.
 
-def has_len_1(entry):
-    '''
-    Returns True if entry is 1 character long, otherwise returns False.
-    '''
-    len(guess) == 1  # Yes, this is correct syntax.
-
 def is_word_guessed(secret_word, letters_guessed):
     '''
     secret_word: string, the word the user is guessing; assumes all letters are
