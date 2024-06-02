@@ -139,7 +139,7 @@ def hangman_figure(guesses_left):
         """
            ------
            |    |
-           |    O
+           |    💀
            |   \\|/
            |    |
            |   / \\
@@ -309,7 +309,19 @@ def hangman_with_hints(secret_word):
             break
 
         if number_of_guesses <= 0:
-            print("Sorry, you ran out of guesses. The word was", secret_word)
+            clear_screen()
+            print(
+                f"End of the game Hangman!\nI was thinking of a word that is {length_of_secret_word} letters long."
+            )
+            print(hangman_figure(6))
+            print(
+                f"You have {number_of_guesses} guesses left and {number_of_warnings} warnings left."
+            )
+            print("Available letters:", get_available_letters(letters_guessed))
+            print("Current guessed word:",
+                  get_guessed_word(secret_word, letters_guessed))
+            print("Sorry, you ran out of guesses. The word was \"" +
+                  secret_word + "\".")
             break  # No guesses left, exit the loop
 
 
