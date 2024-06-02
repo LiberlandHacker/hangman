@@ -21,8 +21,8 @@ To play the Hangman game, you need to have Python installed on your computer. If
    - Clone the repository or download the ZIP from the GitHub repository.
 
    ```bash
-   git clone https://github.com/LiberlandHacker/MITOCW_hangman_game.git
-   cd MITOCW_hangman_game
+   git clone https://github.com/LiberlandHacker/hangman.git
+   cd hangman
    ```
 
 2. **Set Up:**
