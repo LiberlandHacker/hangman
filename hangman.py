@@ -4,13 +4,14 @@
 # Time spent: 10h
 
 # Hangman Game
-# NOTE: I have personally taken the liberty to not be limited by the assignment in a strict sense, but have nonetheless fulfilled the spirit of it, if not the letter of it. 
+# NOTE: I have personally taken the liberty to not be limited by the assignment in a strict sense, but have nonetheless fulfilled the spirit of it, if not the letter of it.
 import os  # Needed for clearing the console
 import random
 import string
 
 WORDLIST_FILENAME = "words.txt"
 permitted_chars = string.ascii_lowercase
+
 
 def clear_screen():
     # Check if the operating system is Windows
@@ -19,6 +20,7 @@ def clear_screen():
     # For macOS, Linux/Unix
     else:
         _ = os.system('clear')
+
 
 def load_words():
     """
@@ -37,6 +39,7 @@ def load_words():
     print(f"  {len(wordlist)} words loaded.")
     return wordlist
 
+
 def choose_word(wordlist):
     """
     wordlist (list): list of words (strings)
@@ -44,6 +47,7 @@ def choose_word(wordlist):
     Returns a word from wordlist at random
     """
     return random.choice(wordlist)
+
 
 # -----------------------------------
 
@@ -57,6 +61,7 @@ def is_entry_ascii_lower(entry):
     Returns True if entry is lowercase ASCII, otherwise returns False.
     '''
     entry in permitted_chars  # Yes, this is correct syntax.
+
 
 def is_word_guessed(secret_word, letters_guessed):
     '''
@@ -203,6 +208,7 @@ def hangman_figure(guesses_left):
     ]
     return states[6 - guesses_left]
 
+
 def match_with_gaps(my_word, other_word):
     '''
     my_word: string with _ characters, current guess of secret word
@@ -223,24 +229,39 @@ def match_with_gaps(my_word, other_word):
 
     return True
 
-def show_possible_matches(my_word):
+
+def show_possible_matches(my_word, letters_guessed):
     '''
     my_word: string with _ characters, current guess of secret word
-    returns: nothing, but should print out every word in wordlist that matches my_word
+    letters_guessed: list (of letters), which letters have been guessed so far
+    returns: nothing, but should print out every word in wordlist that matches my_word and
+             does not contain any letters that are not in the secret word.
     '''
-    matches = [word for word in wordlist if match_with_gaps(my_word, word)]
+    # Extract letters from my_word that are guessed correctly
+    correct_letters = set([char for char in my_word if char != '_'])
+    # Determine incorrect letters from letters guessed
+    incorrect_letters = [
+        char for char in letters_guessed if char not in correct_letters
+    ]
+
+    matches = []
+    for word in wordlist:
+        if match_with_gaps(my_word, word) and not any(char in incorrect_letters
+                                                      for char in word):
+            matches.append(word)
+
     if matches:
         print("Possible word matches are:")
         print(" ".join(matches))
     else:
         print("No matches found.")
 
+
 def hangman_with_hints(secret_word):
     length_of_secret_word = len(secret_word)
     number_of_guesses = 6
     number_of_warnings = 3
     letters_guessed = set()
-
 
     while number_of_guesses > 0:
         clear_screen()
@@ -258,8 +279,11 @@ def hangman_with_hints(secret_word):
         guess = input("Please enter a letter, or '*' for a hint: ").lower()
 
         if guess == "*":
-            show_possible_matches(get_guessed_word(secret_word, letters_guessed))
+            show_possible_matches(
+                get_guessed_word(secret_word, letters_guessed),
+                letters_guessed)
             input("Press enter to continue...")  # Wait for user input
+
         elif guess in letters_guessed:
             number_of_guesses, number_of_warnings = warning_decrement(
                 number_of_guesses, number_of_warnings)
@@ -288,7 +312,7 @@ def hangman_with_hints(secret_word):
             print("Sorry, you ran out of guesses. The word was", secret_word)
             break  # No guesses left, exit the loop
 
+
 if __name__ == "__main__":
     secret_word = choose_word(wordlist)
     hangman_with_hints(secret_word)
-
