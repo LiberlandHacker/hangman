@@ -33,7 +33,7 @@ To play the Hangman game, you need to have Python installed on your computer. If
 To start the game, navigate to the game directory in your terminal and run the Python script:
 
 ```bash
-python hangman.py
+python3 hangman.py
 ```
 
 - Follow the on-screen instructions to make guesses.
